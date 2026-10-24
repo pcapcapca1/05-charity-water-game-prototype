@@ -1,5 +1,3 @@
-// Log a message to the console to ensure the script is linked correctly
-console.log('JavaScript file is linked correctly.');
 // --- MAZE CONFIGURATION (9 Rows x 11 Columns) ---
 // Wall Bitmask: 1 = Top, 2 = Right, 4 = Bottom, 8 = Left
 const ROWS = 9;

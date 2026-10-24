@@ -191,7 +191,7 @@ body {
 }
 
 /* Main Workspace Layout */
-.game-Workspace {
+.game-workspace {
   max-width: 1240px;
   width: 100%;
   margin: 24px auto;
@@ -243,8 +243,9 @@ body {
 .maze-grid {
   display: grid;
   grid-template-columns: repeat(11, 1fr);
-  grid-template-rows: repeat(9, 1fr);
-  aspect-ratio: 11 / 9;
+  grid-template-rows: repeat(9, minmax(52px, 1fr));
+  width: 100%;
+  min-height: 468px;
   border: 5px solid var(--cw-wall);
   background-color: var(--cw-tile);
 }
@@ -256,33 +257,37 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 52px;
 }
 
 /* Wall thickness classes */
-.wall-top { border-top: 5px solid var(--cw-wall); }
-.wall-right { border-right: 5px solid var(--cw-wall); }
-.wall-bottom { border-bottom: 5px solid var(--cw-wall); }
-.wall-left { border-left: 5px solid var(--cw-wall); }
+.wall-top { border-top: 5px solid var(--cw-wall) !important; }
+.wall-right { border-right: 5px solid var(--cw-wall) !important; }
+.wall-bottom { border-bottom: 5px solid var(--cw-wall) !important; }
+.wall-left { border-left: 5px solid var(--cw-wall) !important; }
 
 /* Maze Entities */
 .player-drop {
-  width: 72%;
-  height: 72%;
+  width: 38px;
+  height: 38px;
   background: radial-gradient(circle at 35% 30%, #7be0ff, #0099cc);
   border: 2px solid #fff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: Arial, sans-serif;
   font-size: 0.75rem;
+  font-weight: bold;
+  color: #0b2e3d;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
-  transition: opacity 0.3s ease, transform 0.12s ease;
+  transition: opacity 0.3s ease;
   z-index: 2;
 }
 
 .lost-drop {
-  width: 52%;
-  height: 66%;
+  width: 26px;
+  height: 32px;
   background: linear-gradient(180deg, #9ae8ff 0%, #2cb5e8 100%);
   border: 2px solid #ffffff;
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
@@ -291,8 +296,8 @@ body {
 }
 
 .hazard-patch {
-  width: 68%;
-  height: 68%;
+  width: 34px;
+  height: 34px;
   background: radial-gradient(circle, #7a5230 20%, #4a2e16 90%);
   border: 2px dashed #a87951;
   border-radius: 50%;
@@ -301,12 +306,13 @@ body {
   justify-content: center;
   color: #e6cfa7;
   font-family: Arial, sans-serif;
-  font-size: 0.7rem;
+  font-weight: bold;
+  font-size: 0.85rem;
 }
 
 .well-goal {
-  width: 82%;
-  height: 82%;
+  width: 44px;
+  height: 44px;
   background-color: #6b4423;
   border: 3px solid #3d2310;
   border-radius: 50%;
@@ -316,14 +322,14 @@ body {
   justify-content: center;
   color: #fff;
   font-family: Arial, sans-serif;
-  font-size: 0.52rem;
+  font-size: 0.55rem;
   font-weight: bold;
-  box-shadow: inset 0 3px 6px rgba(0,0,0,0.5);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.5);
 }
 
 .well-water {
-  width: 65%;
-  height: 40%;
+  width: 24px;
+  height: 14px;
   background: #66d9ff;
   border-radius: 50%;
   margin-bottom: 2px;
@@ -499,7 +505,7 @@ body {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .modal-card {
@@ -569,10 +575,17 @@ body {
 
 /* Responsive Layout Adjustments */
 @media (max-width: 920px) {
-  .game-Workspace {
+  .game-workspace {
     grid-template-columns: 1fr;
   }
   .mobile-controls {
     display: flex;
+  }
+  .maze-grid {
+    grid-template-rows: repeat(9, minmax(36px, 1fr));
+    min-height: 324px;
+  }
+  .cell {
+    min-height: 36px;
   }
 }
