@@ -1,13 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Charity Water Game</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drop to the Well | charity: water Prototype</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <h1>Welcome to the Charity Water Game Prototype</h1>
-    <script src="script.js"></script>
+  <!-- Confetti Canvas for LevelUp Win Celebration -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Top Header -->
+  <header class="site-header">
+    <div class="brand-lockup">
+      <div class="jerry-can-icon" aria-hidden="true">
+        <span class="jerry-x">✕</span>
+      </div>
+      <span class="brand-name">charity: water</span>
+    </div>
+
+    <div class="title-group">
+      <p class="subtitle">A TINY WATER ADVENTURE</p>
+      <h1 class="game-title">Drop to the Well</h1>
+    </div>
+
+    <div class="hud-controls">
+      <div class="hydration-box" id="hydration-box">
+        <span class="hydration-label">HYDRATION</span>
+        <strong class="hydration-value">
+          <span id="hydration-count">100</span>/100. DEPLETES 6 PER SECOND
+        </strong>
+        <div class="hydration-bar-bg">
+          <div class="hydration-bar-fill" id="hydration-bar"></div>
+        </div>
+      </div>
+      <button id="reset-btn" class="reset-btn" type="button">↻ Reset</button>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="game-Workspace">
+    <!-- Left Maze Container -->
+    <section class="maze-card">
+      <div class="maze-card-header">
+        <h2 class="maze-prompt">Find the well before the earth drinks first.</h2>
+        <span id="feedback-banner" class="feedback-banner">Press any arrow key to start!</span>
+      </div>
+
+      <div class="maze-yellow-frame">
+        <div id="maze-grid" class="maze-grid" role="grid" aria-label="Maze Board"></div>
+      </div>
+
+      <!-- Mobile / Responsive Touch Controls -->
+      <div class="mobile-controls" aria-label="On-screen directional pad">
+        <button class="dpad-btn" data-dir="up" aria-label="Move Up">▲</button>
+        <div class="dpad-middle">
+          <button class="dpad-btn" data-dir="left" aria-label="Move Left">◀</button>
+          <button class="dpad-btn" data-dir="down" aria-label="Move Down">▼</button>
+          <button class="dpad-btn" data-dir="right" aria-label="Move Right">▶</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Sidebar Panels -->
+    <aside class="sidebar">
+      <!-- Mission Panel -->
+      <div class="card mission-card">
+        <span class="badge-mission">🌱 YOUR MISSION</span>
+        <h3>Lead the first drop home.</h3>
+        <p>
+          The water drop wants to achieve his dream of quenching thirst and he needs to find the
+          way to the well. But wait! He hears the splashing of other drops nearby—will he
+          guide them to the end or will he leave them behind?
+        </p>
+        <ol class="mission-steps">
+          <li>Guide your water drop using the arrows (or WASD)</li>
+          <li>Avoid closed earthen walls &amp; dry cracks (-15 hydration)</li>
+          <li>Gather the other droplets, they help hydrate (+20)</li>
+          <li>Reach the well before hydration hits 0</li>
+        </ol>
+      </div>
+
+      <!-- Lost Droplets Counter Card -->
+      <div class="card droplets-card">
+        <div class="droplets-header">
+          <h4>Lost droplets (adds 20 hydration)</h4>
+          <span class="droplets-left"><strong id="drops-left-count">8</strong> LEFT</span>
+        </div>
+        <p>
+          They are lost and need your help, find them and bring them with you to the well or
+          prioritize your own well-being. Remember, you dehydrate very quickly.
+        </p>
+      </div>
+
+      <!-- Win / Lose Status Rules Card -->
+      <div class="card conditions-card">
+        <div class="condition-row">
+          <div class="status-icon win-icon">✓</div>
+          <div>
+            <h4>Reach the well</h4>
+            <p>Preferably with the droplets</p>
+          </div>
+        </div>
+        <hr class="condition-divider" />
+        <div class="condition-row">
+          <div class="status-icon lose-icon">!</div>
+          <div>
+            <h4>Completely dehydrate</h4>
+            <p>Everyone seeps into the dirt.</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- End Game Modal (Win / Lose Popup) -->
+  <div id="end-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2 id="modal-title">You Reached the Well!</h2>
+      <p id="modal-message"></p>
+      <div class="modal-stats">
+        <div>Hydration Left (Score): <strong id="final-score">0</strong></div>
+        <div>Droplets Rescued: <strong id="final-drops">0 / 8</strong></div>
+      </div>
+      <div class="modal-actions">
+        <button id="play-again-btn" class="primary-btn" type="button">Play Again</button>
+        <a
+          href="https://www.charitywater.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="cta-link"
+        >
+          Learn How charity: water Builds Clean Wells →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
