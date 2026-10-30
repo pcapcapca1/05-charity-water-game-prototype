@@ -1,5 +1,10 @@
 # Charity: water Completed Game
 
-In this project, you’ll begin transforming your game concept from last week into a working interactive prototype using HTML, CSS, and JavaScript.
+Time to finalize the game you’re building for charity: water and turn it into a more polished, playable experience — something that feels complete, engaging, and aligned with charity: water's mission and brand.
 
-This first version should focus on core functionality — clickable elements, score tracking, and a basic layout. The goal is to bring your idea to life with simple, working mechanics that you’ll refine and expand in the next milestone.
+Project Steps Overview:
+This is your chance to level up what you've already built! The core functionality is already in place. Now it's time to polish, enhance, and finalize your game by:
+Making it more enjoyable and engaging to play
+Strengthening its connection to charity: water's mission and brand
+Adding thoughtful touches that improve the overall experience
+
