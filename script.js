@@ -13,6 +13,11 @@ const WELL_POS = { r: 5, c: 9 };
 const DROPLET_COUNT = 8;
 const HAZARD_COUNT = 2;
 const EXTRA_PASSAGES = 30;
+const MILESTONES = [
+  { rescued: 1, message: 'Milestone reached: Your first droplet is safe!' },
+  { rescued: 4, message: 'Halfway there! Four droplets rescued!' },
+  { rescued: 8, message: 'Amazing! Every droplet has been rescued!' }
+];
 const DIFFICULTIES = {
   easy: { label: 'Easy', drainRate: 6 },
   medium: { label: 'Medium', drainRate: 12 },
@@ -133,6 +138,8 @@ let timerInterval = null;
 let gameStarted = false;
 let gameOver = false;
 let currentDifficulty = 'easy';
+let reachedMilestones = [];
+let audioContext = null;
 
 // --- DOM ELEMENTS ---
 const mazeGridEl = document.getElementById('maze-grid');
@@ -167,12 +174,79 @@ function initGame() {
     .map(cell => ({ ...cell, triggered: false }));
   gameStarted = false;
   gameOver = false;
+  reachedMilestones = [];
 
   endModal.classList.add('hidden');
   stopConfetti();
   updateHUD();
   setFeedback('Press any arrow key (or WASD) to begin your journey!', '#ffc72c');
   renderMaze();
+}
+
+function playSound(type) {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return;
+
+  if (!audioContext) audioContext = new AudioContext();
+  if (audioContext.state === 'suspended') audioContext.resume();
+
+  const playTone = (frequency, duration, wave, startTime, volume = 0.08) => {
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    oscillator.type = wave;
+    oscillator.frequency.setValueAtTime(frequency, startTime);
+    gain.gain.setValueAtTime(volume, startTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start(startTime);
+    oscillator.stop(startTime + duration);
+  };
+
+  const now = audioContext.currentTime;
+  if (type === 'collect') {
+    // Two quick rising notes make collecting a drop sound playful.
+    playTone(660, 0.12, 'sine', now);
+    playTone(880, 0.16, 'sine', now + 0.08);
+  } else if (type === 'hazard') {
+    // A low tone and filtered noise suggest stepping on dry, gritty earth.
+    playTone(120, 0.22, 'triangle', now, 0.1);
+    const noiseBuffer = audioContext.createBuffer(
+      1,
+      audioContext.sampleRate * 0.18,
+      audioContext.sampleRate
+    );
+    const noiseData = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < noiseData.length; i++) {
+      noiseData[i] = (Math.random() * 2 - 1) * (1 - i / noiseData.length);
+    }
+    const noise = audioContext.createBufferSource();
+    const noiseGain = audioContext.createGain();
+    noise.buffer = noiseBuffer;
+    noiseGain.gain.setValueAtTime(0.06, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+    noise.connect(noiseGain);
+    noiseGain.connect(audioContext.destination);
+    noise.start(now);
+  } else if (type === 'win') {
+    // A gentle descending pair of notes gives the well a calm splash-like finish.
+    playTone(660, 0.4, 'sine', now, 0.06);
+    playTone(523, 0.55, 'sine', now + 0.12, 0.05);
+  } else if (type === 'click') {
+    playTone(420, 0.06, 'square', now);
+  }
+}
+
+function checkMilestones() {
+  const rescuedCount = droplets.filter(d => d.collected).length;
+  const milestone = MILESTONES.find(
+    item => item.rescued === rescuedCount && !reachedMilestones.includes(item.rescued)
+  );
+
+  if (milestone) {
+    reachedMilestones.push(milestone.rescued);
+    setFeedback(milestone.message, '#ffc72c');
+  }
 }
 
 // --- RENDER MAZE GRID ---
@@ -305,7 +379,9 @@ function checkTileInteractions() {
   if (foundDrop) {
     foundDrop.collected = true;
     hydration = Math.min(100, hydration + 20);
+    playSound('collect');
     setFeedback('Rescued a lost droplet! +20 Hydration!', '#7bed9f');
+    checkMilestones();
   }
 
   // 2. Check Dry Crack Obstacle (-15 Hydration)
@@ -315,6 +391,7 @@ function checkTileInteractions() {
   if (hitHazard) {
     hitHazard.triggered = true;
     hydration = Math.max(0, hydration - 15);
+    playSound('hazard');
     setFeedback('Ouch! Stepped on dry cracked earth! -15 Hydration!', '#ff6b6b');
     if (hydration <= 0) {
       endGame(false);
@@ -361,6 +438,7 @@ function endGame(won) {
   finalDropsEl.textContent = `${rescuedCount} / ${droplets.length}`;
 
   if (won) {
+    playSound('win');
     launchConfetti();
     if (rescuedCount === droplets.length) {
       modalTitle.textContent = 'Incredible! Every Drop Saved!';
@@ -401,12 +479,22 @@ window.addEventListener('keydown', e => {
 });
 
 document.querySelectorAll('.dpad-btn').forEach(btn => {
-  btn.addEventListener('click', () => movePlayer(btn.dataset.dir));
+  btn.addEventListener('click', () => {
+    playSound('click');
+    movePlayer(btn.dataset.dir);
+  });
 });
 
-resetBtn.addEventListener('click', initGame);
-playAgainBtn.addEventListener('click', initGame);
+resetBtn.addEventListener('click', () => {
+  playSound('click');
+  initGame();
+});
+playAgainBtn.addEventListener('click', () => {
+  playSound('click');
+  initGame();
+});
 difficultySelect.addEventListener('change', () => {
+  playSound('click');
   currentDifficulty = difficultySelect.value;
   initGame();
 });
