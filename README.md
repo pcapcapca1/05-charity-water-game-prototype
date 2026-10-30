@@ -1,4 +1,4 @@
-# Charity: water Game Prototype
+# Charity: water Completed Game
 
 In this project, you’ll begin transforming your game concept from last week into a working interactive prototype using HTML, CSS, and JavaScript.
 
