@@ -3,38 +3,126 @@
 const ROWS = 9;
 const COLS = 11;
 
-const MAZE_WALLS = [
-  [9, 5, 1, 3, 9, 5, 1, 5, 3, 9, 3],
-  [8, 1, 2, 12, 2, 9, 4, 1, 2, 8, 2],
-  [10, 12, 4, 3, 8, 2, 9, 2, 10, 10, 2],
-  [8, 3, 9, 2, 13, 0, 2, 12, 2, 8, 2],
-  [8, 2, 12, 0, 5, 2, 12, 3, 12, 0, 2],
-  [10, 12, 1, 2, 9, 0, 3, 8, 3, 13, 2],
-  [8, 1, 2, 10, 8, 2, 12, 2, 12, 1, 2],
-  [8, 2, 12, 2, 10, 8, 1, 4, 3, 10, 2],
-  [10, 12, 5, 4, 6, 12, 4, 5, 4, 4, 6]
-];
+let mazeWalls = [];
 
-// Coordinates matching your wireframe
+// The start and well stay in place, while the paths between them change.
 const START_POS = { r: 8, c: 0 };
 const WELL_POS = { r: 5, c: 9 };
 
-const INITIAL_DROPLETS = [
-  { r: 0, c: 3 },
-  { r: 1, c: 1 },
-  { r: 1, c: 8 },
-  { r: 3, c: 4 },
-  { r: 4, c: 0 },
-  { r: 5, c: 6 },
-  { r: 7, c: 6 },
-  { r: 8, c: 10 }
-];
-
 // LevelUp Challenge: Dry Dirt Cracks (-15 Hydration penalty)
-const INITIAL_HAZARDS = [
-  { r: 2, c: 5 },
-  { r: 6, c: 2 }
-];
+const DROPLET_COUNT = 8;
+const HAZARD_COUNT = 2;
+const EXTRA_PASSAGES = 30;
+const DIFFICULTIES = {
+  easy: { label: 'Easy', drainRate: 6 },
+  medium: { label: 'Medium', drainRate: 12 },
+  hard: { label: 'Hard', drainRate: 18 }
+};
+
+function shuffle(items) {
+  return items.sort(() => Math.random() - 0.5);
+}
+
+// Generate a connected maze by carving paths through every cell.
+function generateMaze() {
+  mazeWalls = Array.from({ length: ROWS }, () => Array(COLS).fill(15));
+  const visited = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
+  const directions = [
+    { dr: -1, dc: 0, wall: 1, opposite: 4 },
+    { dr: 0, dc: 1, wall: 2, opposite: 8 },
+    { dr: 1, dc: 0, wall: 4, opposite: 1 },
+    { dr: 0, dc: -1, wall: 8, opposite: 2 }
+  ];
+
+  function carve(r, c) {
+    visited[r][c] = true;
+
+    shuffle([...directions]).forEach(direction => {
+      const nextR = r + direction.dr;
+      const nextC = c + direction.dc;
+      const insideGrid = nextR >= 0 && nextR < ROWS && nextC >= 0 && nextC < COLS;
+
+      if (insideGrid && !visited[nextR][nextC]) {
+        mazeWalls[r][c] -= direction.wall;
+        mazeWalls[nextR][nextC] -= direction.opposite;
+        carve(nextR, nextC);
+      }
+    });
+  }
+
+  carve(START_POS.r, START_POS.c);
+
+  // Open extra walls to create loops and alternate routes.
+  const possiblePassages = [];
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (r < ROWS - 1) possiblePassages.push({ r, c, wall: 4, opposite: 1, nextR: r + 1, nextC: c });
+      if (c < COLS - 1) possiblePassages.push({ r, c, wall: 2, opposite: 8, nextR: r, nextC: c + 1 });
+    }
+  }
+
+  shuffle(possiblePassages)
+    .slice(0, EXTRA_PASSAGES)
+    .forEach(passage => {
+      if (mazeWalls[passage.r][passage.c] & passage.wall) {
+        mazeWalls[passage.r][passage.c] -= passage.wall;
+        mazeWalls[passage.nextR][passage.nextC] -= passage.opposite;
+      }
+    });
+}
+
+function findPathToWell() {
+  const directions = [
+    { dr: -1, dc: 0, wall: 1 },
+    { dr: 0, dc: 1, wall: 2 },
+    { dr: 1, dc: 0, wall: 4 },
+    { dr: 0, dc: -1, wall: 8 }
+  ];
+  const queue = [{ ...START_POS }];
+  const previous = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+  previous[START_POS.r][START_POS.c] = START_POS;
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    if (current.r === WELL_POS.r && current.c === WELL_POS.c) break;
+
+    directions.forEach(direction => {
+      const nextR = current.r + direction.dr;
+      const nextC = current.c + direction.dc;
+      const insideGrid = nextR >= 0 && nextR < ROWS && nextC >= 0 && nextC < COLS;
+      const canMove = !(mazeWalls[current.r][current.c] & direction.wall);
+
+      if (insideGrid && canMove && previous[nextR][nextC] === null) {
+        previous[nextR][nextC] = current;
+        queue.push({ r: nextR, c: nextC });
+      }
+    });
+  }
+
+  const path = [];
+  let current = { ...WELL_POS };
+  while (current.r !== START_POS.r || current.c !== START_POS.c) {
+    path.unshift(current);
+    current = previous[current.r][current.c];
+  }
+  return path;
+}
+
+function randomOpenCells(count, excludedCells = []) {
+  const availableCells = [];
+  const excludedKeys = excludedCells.map(cell => `${cell.r},${cell.c}`);
+
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const isStart = r === START_POS.r && c === START_POS.c;
+      const isWell = r === WELL_POS.r && c === WELL_POS.c;
+      const isExcluded = excludedKeys.includes(`${r},${c}`);
+      if (!isStart && !isWell && !isExcluded) availableCells.push({ r, c });
+    }
+  }
+
+  return shuffle(availableCells).slice(0, count);
+}
 
 // --- GAME STATE ---
 let playerPos = { ...START_POS };
@@ -44,10 +132,12 @@ let hazards = [];
 let timerInterval = null;
 let gameStarted = false;
 let gameOver = false;
+let currentDifficulty = 'easy';
 
 // --- DOM ELEMENTS ---
 const mazeGridEl = document.getElementById('maze-grid');
 const hydrationCountEl = document.getElementById('hydration-count');
+const hydrationRateEl = document.getElementById('hydration-rate');
 const hydrationBarEl = document.getElementById('hydration-bar');
 const dropsLeftCountEl = document.getElementById('drops-left-count');
 const feedbackBannerEl = document.getElementById('feedback-banner');
@@ -58,15 +148,23 @@ const modalMessage = document.getElementById('modal-message');
 const finalScoreEl = document.getElementById('final-score');
 const finalDropsEl = document.getElementById('final-drops');
 const playAgainBtn = document.getElementById('play-again-btn');
+const difficultySelect = document.getElementById('difficulty-select');
 
 // --- INITIALIZE / RESET GAME ---
 function initGame() {
   clearInterval(timerInterval);
   timerInterval = null;
+  generateMaze();
   playerPos = { ...START_POS };
   hydration = 100;
-  droplets = INITIAL_DROPLETS.map(d => ({ ...d, collected: false }));
-  hazards = INITIAL_HAZARDS.map(h => ({ ...h, triggered: false }));
+  const pathCells = shuffle(findPathToWell().slice(0, -1)).slice(0, 6);
+  const randomCells = randomOpenCells(DROPLET_COUNT + HAZARD_COUNT - pathCells.length, pathCells);
+  droplets = [...pathCells, ...randomCells]
+    .slice(0, DROPLET_COUNT)
+    .map(cell => ({ ...cell, collected: false }));
+  hazards = randomCells
+    .slice(DROPLET_COUNT - pathCells.length)
+    .map(cell => ({ ...cell, triggered: false }));
   gameStarted = false;
   gameOver = false;
 
@@ -86,7 +184,7 @@ function renderMaze() {
       const cell = document.createElement('div');
       cell.classList.add('cell');
 
-      const mask = MAZE_WALLS[r][c];
+      const mask = mazeWalls[r][c];
       if (mask & 1) cell.classList.add('wall-top');
       if (mask & 2) cell.classList.add('wall-right');
       if (mask & 4) cell.classList.add('wall-bottom');
@@ -140,10 +238,11 @@ function renderMaze() {
 function startTimer() {
   if (gameStarted || gameOver) return;
   gameStarted = true;
-  setFeedback('Hydration draining at 6/sec—hurry to the well!', '#ffc72c');
+  const drainRate = DIFFICULTIES[currentDifficulty].drainRate;
+  setFeedback(`Hydration draining at ${drainRate}/sec—hurry to the well!`, '#ffc72c');
 
   timerInterval = setInterval(() => {
-    hydration = Math.max(0, hydration - 6);
+    hydration = Math.max(0, hydration - drainRate);
     updateHUD();
     renderMaze();
 
@@ -161,30 +260,30 @@ function movePlayer(dir) {
   if (!gameStarted) startTimer();
 
   const { r, c } = playerPos;
-  const currentMask = MAZE_WALLS[r][c];
+  const currentMask = mazeWalls[r][c];
   let nextR = r;
   let nextC = c;
 
   if (dir === 'up') {
-    if (r === 0 || (currentMask & 1) || (MAZE_WALLS[r - 1][c] & 4)) {
+    if (r === 0 || (currentMask & 1) || (mazeWalls[r - 1][c] & 4)) {
       setFeedback('Blocked by an earthen wall!', '#ff9f43');
       return;
     }
     nextR--;
   } else if (dir === 'right') {
-    if (c === COLS - 1 || (currentMask & 2) || (MAZE_WALLS[r][c + 1] & 8)) {
+    if (c === COLS - 1 || (currentMask & 2) || (mazeWalls[r][c + 1] & 8)) {
       setFeedback('Blocked by an earthen wall!', '#ff9f43');
       return;
     }
     nextC++;
   } else if (dir === 'down') {
-    if (r === ROWS - 1 || (currentMask & 4) || (MAZE_WALLS[r + 1][c] & 1)) {
+    if (r === ROWS - 1 || (currentMask & 4) || (mazeWalls[r + 1][c] & 1)) {
       setFeedback('Blocked by an earthen wall!', '#ff9f43');
       return;
     }
     nextR++;
   } else if (dir === 'left') {
-    if (c === 0 || (currentMask & 8) || (MAZE_WALLS[r][c - 1] & 2)) {
+    if (c === 0 || (currentMask & 8) || (mazeWalls[r][c - 1] & 2)) {
       setFeedback('Blocked by an earthen wall!', '#ff9f43');
       return;
     }
@@ -232,6 +331,7 @@ function checkTileInteractions() {
 // --- HUD UPDATES ---
 function updateHUD() {
   hydrationCountEl.textContent = hydration;
+  hydrationRateEl.textContent = DIFFICULTIES[currentDifficulty].drainRate;
   hydrationBarEl.style.width = `${hydration}%`;
 
   if (hydration < 30) {
@@ -306,6 +406,10 @@ document.querySelectorAll('.dpad-btn').forEach(btn => {
 
 resetBtn.addEventListener('click', initGame);
 playAgainBtn.addEventListener('click', initGame);
+difficultySelect.addEventListener('change', () => {
+  currentDifficulty = difficultySelect.value;
+  initGame();
+});
 
 // --- CONFETTI CELEBRATION (LevelUp +5pts) ---
 const confettiCanvas = document.getElementById('confetti-canvas');

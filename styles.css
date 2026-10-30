@@ -140,6 +140,29 @@ body {
   min-width: 0;
 }
 
+.difficulty-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--cw-brown);
+  font-family: var(--cw-font);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.difficulty-control select {
+  background-color: #fff;
+  border: 2px solid var(--cw-wall);
+  border-radius: 8px;
+  color: var(--cw-dark);
+  font-family: var(--cw-font);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
 .hydration-box {
   background-color: #eedbb5;
   border: 2px solid var(--cw-wall);
@@ -656,6 +679,11 @@ body {
 
   .hud-controls {
     gap: 8px;
+  }
+
+  .difficulty-control select {
+    font-size: 0.8rem;
+    padding: 8px 6px;
   }
 
   .hydration-box {

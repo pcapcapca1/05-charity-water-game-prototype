@@ -27,10 +27,19 @@
     </div>
 
     <div class="hud-controls">
+      <label class="difficulty-control" for="difficulty-select">
+        <span>DIFFICULTY</span>
+        <select id="difficulty-select">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </label>
       <div class="hydration-box" id="hydration-box">
         <span class="hydration-label">HYDRATION</span>
         <strong class="hydration-value">
-          <span id="hydration-count">100</span>/100. DEPLETES 6 PER SECOND
+          <span id="hydration-count">100</span>/100.
+          DEPLETES <span id="hydration-rate">6</span> PER SECOND
         </strong>
         <div class="hydration-bar-bg">
           <div class="hydration-bar-fill" id="hydration-bar"></div>
