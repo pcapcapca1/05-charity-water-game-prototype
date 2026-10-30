@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap');
+
 /* Charity: water Brand Colors
 
 Primary Colors:
@@ -14,6 +16,7 @@ Secondary Colors:
 
 */
 :root {
+  --cw-font: 'Nunito Sans', Arial, sans-serif;
   --cw-yellow: #ffc72c;
   --cw-cream: #f9f0dc;
   --cw-sky: #bce4ef;
@@ -33,7 +36,7 @@ Secondary Colors:
 }
 
 body {
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: var(--cw-font);
   background-color: var(--cw-sky);
   color: var(--cw-dark);
   min-height: 100vh;
@@ -83,7 +86,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: sans-serif;
+  font-family: var(--cw-font);
   font-weight: bold;
   color: #fff;
 }
@@ -116,7 +119,7 @@ body {
 }
 
 .subtitle {
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
   font-size: 0.75rem;
   letter-spacing: 1.5px;
   color: var(--cw-green);
@@ -143,7 +146,7 @@ body {
   border-radius: 10px;
   padding: 10px 16px;
   min-width: 0;
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
 }
 
 .hydration-label {
@@ -181,7 +184,7 @@ body {
   border: 2px solid var(--cw-wall);
   border-radius: 8px;
   padding: 12px 16px;
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
   font-weight: bold;
   cursor: pointer;
   transition: transform 0.1s ease, background-color 0.2s;
@@ -232,7 +235,7 @@ body {
 }
 
 .feedback-banner {
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
   font-size: 0.85rem;
   background: rgba(255, 199, 44, 0.2);
   color: var(--cw-yellow);
@@ -284,7 +287,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
   font-size: 0.75rem;
   font-weight: bold;
   color: #0b2e3d;
@@ -313,7 +316,7 @@ body {
   align-items: center;
   justify-content: center;
   color: #e6cfa7;
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
   font-weight: bold;
   font-size: 0.85rem;
 }
@@ -329,7 +332,7 @@ body {
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
   font-size: 0.55rem;
   font-weight: bold;
   box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.5);
@@ -370,7 +373,7 @@ body {
   display: inline-block;
   background-color: var(--cw-green);
   color: #fff;
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
   font-size: 0.72rem;
   font-weight: bold;
   padding: 5px 12px;
@@ -385,7 +388,7 @@ body {
 }
 
 .mission-card p {
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
   font-size: 0.9rem;
   line-height: 1.45;
   color: #3d352e;
@@ -396,7 +399,7 @@ body {
   background-color: #f3e1bd;
   border-radius: 10px;
   padding: 12px 16px 12px 30px;
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
   font-size: 0.85rem;
   line-height: 1.65;
 }
@@ -419,7 +422,7 @@ body {
 }
 
 .droplets-left {
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
   font-size: 0.8rem;
   background: rgba(255, 255, 255, 0.2);
   padding: 4px 8px;
@@ -427,7 +430,7 @@ body {
 }
 
 .droplets-card p {
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
   font-size: 0.82rem;
   line-height: 1.45;
   opacity: 0.95;
@@ -436,7 +439,7 @@ body {
 .conditions-card {
   background-color: var(--cw-brown);
   color: #fff;
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
 }
 
 .condition-row {
@@ -516,6 +519,38 @@ body {
   display: none !important;
 }
 
+/* Footer links connect the game to charity: water's work. */
+.site-footer {
+  background-color: var(--cw-dark);
+  color: #fff;
+  padding: 24px 20px;
+  text-align: center;
+  font-family: var(--cw-font);
+}
+
+.site-footer p {
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: var(--cw-yellow);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.footer-links a:hover,
+.footer-links a:focus {
+  text-decoration: underline;
+}
+
 .modal-card {
   background: var(--cw-cream);
   border: 4px solid var(--cw-yellow);
@@ -534,7 +569,7 @@ body {
 }
 
 .modal-card p {
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
   font-size: 0.95rem;
   line-height: 1.5;
   color: #3d352e;
@@ -545,7 +580,7 @@ body {
   background: #f1dec0;
   border-radius: 10px;
   padding: 12px;
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
   font-size: 0.9rem;
   display: flex;
   justify-content: space-around;
@@ -562,7 +597,7 @@ body {
   background: var(--cw-yellow);
   border: 2px solid var(--cw-brown);
   padding: 12px 20px;
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
   font-size: 1rem;
   font-weight: bold;
   border-radius: 8px;
@@ -570,7 +605,7 @@ body {
 }
 
 .cta-link {
-  font-family: Arial, sans-serif;
+  font-family: var(--cw-font);
   font-size: 0.9rem;
   color: var(--cw-teal);
   font-weight: bold;
